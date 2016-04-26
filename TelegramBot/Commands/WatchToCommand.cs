@@ -22,6 +22,15 @@ namespace TelegramBot
             if (words.Length < 2)
             {
                 bot.SendTextMessage(chatId, "Не удалось распознать аргументы команды. Пример команды - 'подписаться где иванов'");
+                return new CommandExecuteResult("");
+            }
+
+            var command = arg.Substring(Name.Length + 1);
+            IBotCommand cmdHandler;
+            if (!new CommandProcessor().TryGetCommandByName(command.Split(' ')[0], out cmdHandler))
+            {
+                bot.SendTextMessage(chatId, "Неизвестная команда " + command.Split(' ')[0]);
+                return new CommandExecuteResult("");
             }
 
             var taskArg = new BotTaskArg()
@@ -31,7 +40,8 @@ namespace TelegramBot
                 Properties = new Dictionary<string, string>(),
                 TaskHandlerName = "подписаться",
             };
-            taskArg.Properties["command"] = arg.Substring(Name.Length + 1);
+
+            taskArg.Properties["command"] = command;
 
             BotTaskProcessor.AddTaskArg(taskArg);
 
