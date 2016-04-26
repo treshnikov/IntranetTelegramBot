@@ -16,11 +16,13 @@ namespace TelegramBot.Task
         private readonly ILogger _logger;
         private static List<IBotTaskHandler>  _handlers;
         public static List<IBotTaskArg> TaskArgs { get; set; }
+        private static Dictionary<TimeSpan, Thread> Threads { get; set; } 
         private static object TaskArgsLock = new object();
 
         static BotTaskProcessor()
         {
             TaskArgs = new List<IBotTaskArg>();
+            Threads = new Dictionary<TimeSpan, Thread>();
         }
 
         public BotTaskProcessor(Api bot, ILogger logger)
@@ -28,39 +30,54 @@ namespace TelegramBot.Task
             _bot = bot;
             _logger = logger;
             PrepareHandlers();
-            LoadArgs();
-            StartThreads();
+            LoadTasksArgs();
+            CheckThreads();
         }
 
-        private void StartThreads()
+        private static void CheckThreads()
         {
-            foreach (var arg in TaskArgs)
+            lock (TaskArgsLock)
             {
-                StartThreadForTaskArg(arg);
-            }
-        }
 
-        private static void StartThreadForTaskArg(IBotTaskArg arg)
-        {
-            IBotTaskHandler handler;
-            if (TryGetHandlerByName(arg.TaskHandlerName, out handler))
-            {
-                ThreadPool.QueueUserWorkItem(args =>
+                foreach (var taskArg in TaskArgs)
                 {
-                    while (true)
+                    if (Threads.ContainsKey(taskArg.Period))
+                        continue;
+
+                    Threads[taskArg.Period] = new Thread(() =>
                     {
-                        try
+                        while (true)
                         {
-                            handler.Handle(_bot, arg);
-                            Thread.Sleep(arg.Period);
+                            IBotTaskArg[] argsForPeriod;
+                            lock (TaskArgsLock)
+                            {
+                                argsForPeriod = TaskArgs.Where(i => i.Period == taskArg.Period).ToArray();
+                            }
+                            if (argsForPeriod.Length == 0)
+                                break;
+
+                            foreach (var arg in argsForPeriod)
+                            {
+                                IBotTaskHandler taskhandler;
+                                if (!TryGetHandlerByName(arg.TaskHandlerName, out taskhandler))
+                                    continue;
+
+                                try
+                                {
+                                    taskhandler.Handle(_bot, arg);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //todo
+                                }
+                            }
+
+                            Thread.Sleep(taskArg.Period);
                         }
-                        catch (Exception ex)
-                        {
-                            Thread.Sleep(arg.Period);
-                            //todo
-                        }
-                    }
-                });
+                    });
+
+                    Threads[taskArg.Period].Start();
+                }
             }
         }
 
@@ -96,7 +113,7 @@ namespace TelegramBot.Task
             }
         }
 
-        private static void LoadArgs()
+        private static void LoadTasksArgs()
         {
             lock (TaskArgsLock)
             {
@@ -106,17 +123,6 @@ namespace TelegramBot.Task
                         new List<IBotTaskArg>(JsonConvert.DeserializeObject<BotTaskArg[]>(File.ReadAllText("tasks.json")));
                 }
             }
-
-            //TaskArgs = new List<IBotTaskArg>
-            //{
-            //    new BotTaskArg()
-            //    {
-            //        ChatId = "175592600",
-            //        Period = TimeSpan.FromSeconds(5),
-            //        TaskHandlerName = "время",
-            //        Properties = new Dictionary<string, string>()
-            //    }
-            //};
         }
 
         public static void SaveArgs()
@@ -137,14 +143,13 @@ namespace TelegramBot.Task
             lock (TaskArgsLock)
             {
                 TaskArgs.Add(arg);
-                StartThreadForTaskArg(arg);
                 SaveArgs();
+                CheckThreads();
             }
         }
 
         public static void RemoveTaskArg(string chatId, string command)
         {
-            // todo - подумать как остановить поток
             lock (TaskArgsLock)
             {
                 TaskArgs.RemoveAll(
