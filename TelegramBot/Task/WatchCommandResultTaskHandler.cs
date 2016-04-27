@@ -7,10 +7,14 @@ namespace TelegramBot.Task
 {
     public class WatchCommandResultTaskHandler : IBotTaskHandler
     {
+        private readonly IBotTaskProcessor _taskProcessor;
+        private readonly ICommandProcessor _commandProcessor;
         public string Name { get; }
 
-        public WatchCommandResultTaskHandler()
+        public WatchCommandResultTaskHandler(IBotTaskProcessor taskProcessor, ICommandProcessor commandProcessor)
         {
+            _taskProcessor = taskProcessor;
+            _commandProcessor = commandProcessor;
             Name = "подписаться";
         }
 
@@ -18,9 +22,8 @@ namespace TelegramBot.Task
         {
             var command = botTaskArg.Properties["command"];
 
-            var cmdProc = new CommandProcessor();
             CommandExecuteResult res;
-            if (cmdProc.TryExecuteCommand(command, bot, botTaskArg.ChatId.ToString(), out res))
+            if (_commandProcessor.TryExecuteCommand(command, bot, botTaskArg.ChatId.ToString(), out res))
             {
                 var currentValue = botTaskArg.Properties.ContainsKey("currentValue")
                     ? botTaskArg.Properties["currentValue"]
@@ -33,7 +36,7 @@ namespace TelegramBot.Task
                 if (!compareFunc(currentValue, res.ResultAsText))
                 {
                     botTaskArg.Properties["currentValue"] = res.ResultAsText;
-                    BotTaskProcessor.SaveArgs();
+                    _taskProcessor.UpdateTaskArg(botTaskArg);
 
                     if (!string.IsNullOrWhiteSpace(currentValue))
                     {

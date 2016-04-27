@@ -8,10 +8,14 @@ namespace TelegramBot
 {
     public class WatchToCommand : IBotCommand
     {
+        private readonly ICommandProcessor _commandProcessor;
+        private readonly IBotTaskProcessor _taskProcessor;
         public string Name { get; }
 
-        public WatchToCommand()
+        public WatchToCommand(ICommandProcessor commandProcessor, IBotTaskProcessor taskProcessor)
         {
+            _commandProcessor = commandProcessor;
+            _taskProcessor = taskProcessor;
             Name = "подписаться";
         }
 
@@ -27,7 +31,7 @@ namespace TelegramBot
 
             var command = arg.Substring(Name.Length + 1);
             IBotCommand cmdHandler;
-            if (!new CommandProcessor().TryGetCommandByName(command.Split(' ')[0], out cmdHandler))
+            if (!_commandProcessor.TryGetCommandByName(command.Split(' ')[0], out cmdHandler))
             {
                 bot.SendTextMessage(chatId, "Неизвестная команда " + command.Split(' ')[0]);
                 return new CommandExecuteResult("");
@@ -35,6 +39,7 @@ namespace TelegramBot
 
             var taskArg = new BotTaskArg()
             {
+                Id = Guid.NewGuid(),
                 ChatId = chatId,
                 Period = TimeSpan.FromSeconds(30),
                 Properties = new Dictionary<string, string>(),
@@ -43,9 +48,9 @@ namespace TelegramBot
 
             taskArg.Properties["command"] = command;
 
-            BotTaskProcessor.AddTaskArg(taskArg);
+            _taskProcessor.AddTaskArg(taskArg);
 
-            var res = new GetSubscribtionListBotCommand().Execute("подписки", bot, chatId).ResultAsText;
+            var res = new GetSubscribtionListBotCommand(_taskProcessor).Execute("подписки", bot, chatId).ResultAsText;
             return new CommandExecuteResult("Подписка успешна добавлена:\r\n" + res);
         }
 

@@ -1,30 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ninject;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace TelegramBot
 {
-    public class CommandProcessor
+    public class CommandProcessor : ICommandProcessor
     {
-        private readonly List<IBotCommand> _commands;
+        private List<IBotCommand> _commands;
 
-        public CommandProcessor()
+        public void SetCommands(IEnumerable<IBotCommand> commands)
         {
-            _commands = new List<IBotCommand>();
-
-            var commandType = typeof(IBotCommand);
-            var commandTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => !p.IsInterface && commandType.IsAssignableFrom(p)).ToList();
-
-            foreach (var ct in commandTypes)
-            {
-                var cmd = Activator.CreateInstance(ct);
-                _commands.Add((IBotCommand)cmd);
-            }
-
+            _commands = new List<IBotCommand>(commands);
         }
 
         public bool TryGetCommandByName(string name, out IBotCommand cmd)

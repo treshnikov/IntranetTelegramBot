@@ -1,7 +1,10 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Infrastructure;
 using Logger;
+using Ninject;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramBot.Task;
@@ -13,14 +16,29 @@ namespace TelegramBot
     {
         private volatile bool _isRunning = false;
         private Api _bot;
-        private NLogger _logger;
-        private CommandProcessor _commandProcessor;
-        private BotTaskProcessor _taskProcessor;
+        private ILogger _logger;
+        private ICommandProcessor _commandProcessor;
+        private IBotTaskProcessor _taskProcessor;
+        private readonly IKernel _kernel;
 
         public TelegramBot()
         {
             System.IO.Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-            _logger = new NLogger();
+
+            _kernel = new StandardKernel();
+            SetBindings();
+
+            _logger = _kernel.Get<ILogger>();
+
+            var botCommands = _kernel.GetAll<IBotCommand>().ToArray();
+            var taskHandlers = _kernel.GetAll<IBotTaskHandler>().ToArray();
+
+            _taskProcessor = _kernel.Get<IBotTaskProcessor>();
+            _taskProcessor.SetHandlers(taskHandlers);
+
+            _commandProcessor = _kernel.Get<ICommandProcessor>();
+            _commandProcessor.SetCommands(botCommands);
+
         }
 
         public void Start()
@@ -36,9 +54,36 @@ namespace TelegramBot
             _bot.StartReceiving();
             _bot.MessageReceived += BotOnMessageReceived();
 
-            _commandProcessor = new CommandProcessor();
-            _taskProcessor = new BotTaskProcessor(_bot, _logger);
+        }
 
+        private void SetBindings()
+        {
+            _kernel.Bind<ILogger>().To<NLogger>();
+
+            var commandTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => !p.IsInterface && typeof (IBotCommand).IsAssignableFrom(p)).ToList();
+
+            var taskHandlerTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => !p.IsInterface && typeof (IBotTaskHandler).IsAssignableFrom(p)).ToList();
+
+            foreach (var commandType in commandTypes)
+            {
+                _kernel.Bind<IBotCommand>().To(commandType).Named(commandType.Name);
+            }
+
+            foreach (var h in taskHandlerTypes)
+            {
+                _kernel.Bind<IBotTaskHandler>().To(h).Named(h.Name);
+            }
+
+            _kernel.Bind<ICommandProcessor>().To<CommandProcessor>()
+                .InSingletonScope();
+
+            _kernel.Bind<IBotTaskProcessor>().To<BotTaskProcessor>()
+                .InSingletonScope()
+                .WithConstructorArgument("bot", _bot);
         }
 
         private EventHandler<MessageEventArgs> BotOnMessageReceived()
