@@ -73,7 +73,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bindings.cs" />
     <Compile Include="Commands\CommandProcessor.cs" />
     <Compile Include="Commands\GetHelpCommand.cs" />
     <Compile Include="Commands\GetSubscribtionListBotCommand.cs" />
