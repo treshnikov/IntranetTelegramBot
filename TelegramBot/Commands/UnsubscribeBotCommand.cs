@@ -7,14 +7,16 @@ namespace TelegramBot
 {
     public class UnsubscribeBotCommand : IBotCommand
     {
+        private readonly IBotTaskProcessor _taskProcessor;
         public string Name { get; }
 
-        public UnsubscribeBotCommand()
+        public UnsubscribeBotCommand(IBotTaskProcessor taskProcessor)
         {
+            _taskProcessor = taskProcessor;
             Name = "отписаться";
         }
 
-        public CommandExecuteResult Execute(string arg, Api bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
         {
             var words = arg.Split(' ');
 
@@ -24,16 +26,16 @@ namespace TelegramBot
             }
             var subscribtionNumber = Int32.Parse(words[1]);
 
-            var subscribtion = BotTaskProcessor.TaskArgs.Where(i => i.ChatId == chatId).ToArray();
+            var subscribtion = _taskProcessor.GetTaskArgs.Where(i => i.ChatId == chatId).ToArray();
 
             if (subscribtion.Length < subscribtionNumber)
             {
                 throw new ArgumentException();
             }
 
-            BotTaskProcessor.RemoveTaskArg(chatId, subscribtion[subscribtionNumber - 1].Properties["command"]);
+            _taskProcessor.RemoveTaskArg(chatId, subscribtion[subscribtionNumber - 1].Properties["command"]);
 
-            var res = new GetSubscribtionListBotCommand().Execute("подписки", bot, chatId).ResultAsText;
+            var res = new GetSubscribtionListBotCommand(_taskProcessor).Execute("подписки", bot, chatId).ResultAsText;
             return new CommandExecuteResult("Подписка успешна удалена:\r\n"+res);
         }
 

@@ -6,16 +6,18 @@ namespace TelegramBot
 {
     public class GetSubscribtionListBotCommand : IBotCommand
     {
+        private readonly IBotTaskProcessor _taskProcessor;
         public string Name { get; }
 
-        public GetSubscribtionListBotCommand()
+        public GetSubscribtionListBotCommand(IBotTaskProcessor taskProcessor)
         {
+            _taskProcessor = taskProcessor;
             Name = "подписки";
         }
 
-        public CommandExecuteResult Execute(string arg, Api bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
         {
-            var subscribtion = BotTaskProcessor.TaskArgs.Where(i => i.ChatId == chatId).ToArray();
+            var subscribtion = _taskProcessor.GetTaskArgs.Where(i => i.ChatId == chatId).ToArray();
 
             if (subscribtion.Length == 0)
             {

@@ -6,39 +6,41 @@ using System.Linq;
 using System.Threading;
 using Logger;
 using Newtonsoft.Json;
+using Ninject;
 using Telegram.Bot;
 
 namespace TelegramBot.Task
 {
-    public class BotTaskProcessor : IDisposable
+    public class BotTaskProcessor : IDisposable, IBotTaskProcessor
     {
-        private static Api _bot;
+        private static IBot _bot;
         private readonly ILogger _logger;
-        private static List<IBotTaskHandler>  _handlers;
-        public static List<IBotTaskArg> TaskArgs { get; set; }
-        private static Dictionary<TimeSpan, Thread> Threads { get; set; } 
-        private static object TaskArgsLock = new object();
+        private List<IBotTaskHandler>  _handlers;
+        public List<IBotTaskArg> TaskArgs { get; set; }
+        private Dictionary<TimeSpan, Thread> Threads { get; set; } 
+        private static readonly object TaskArgsLock = new object();
 
-        static BotTaskProcessor()
+        public BotTaskProcessor(IBot bot, ILogger logger)
         {
             TaskArgs = new List<IBotTaskArg>();
             Threads = new Dictionary<TimeSpan, Thread>();
-        }
+            _handlers = new List<IBotTaskHandler>();
 
-        public BotTaskProcessor(Api bot, ILogger logger)
-        {
             _bot = bot;
             _logger = logger;
-            PrepareHandlers();
             LoadTasksArgs();
             CheckThreads();
         }
 
-        private static void CheckThreads()
+        public void SetHandlers(IEnumerable<IBotTaskHandler> handlers)
+        {
+            _handlers = new List<IBotTaskHandler>(handlers);
+        }
+
+        private void CheckThreads()
         {
             lock (TaskArgsLock)
             {
-
                 foreach (var taskArg in TaskArgs)
                 {
                     if (Threads.ContainsKey(taskArg.Period))
@@ -48,12 +50,12 @@ namespace TelegramBot.Task
                     {
                         while (true)
                         {
-                            IBotTaskArg[] argsForPeriod;
+                            IEnumerable<IBotTaskArg> argsForPeriod;
                             lock (TaskArgsLock)
                             {
                                 argsForPeriod = TaskArgs.Where(i => i.Period == taskArg.Period).ToArray();
                             }
-                            if (argsForPeriod.Length == 0)
+                            if (!argsForPeriod.Any())
                                 break;
 
                             foreach (var arg in argsForPeriod)
@@ -68,7 +70,7 @@ namespace TelegramBot.Task
                                 }
                                 catch (Exception ex)
                                 {
-                                    //todo
+                                    _logger.Error("Ошибка обработки задачи " + ex );
                                 }
                             }
 
@@ -81,7 +83,7 @@ namespace TelegramBot.Task
             }
         }
 
-        public static bool TryGetHandlerByName(string name, out IBotTaskHandler handler)
+        public bool TryGetHandlerByName(string name, out IBotTaskHandler handler)
         {
             foreach (var h in _handlers)
             {
@@ -96,24 +98,7 @@ namespace TelegramBot.Task
             return false;
         }
 
-        private void PrepareHandlers()
-        {
-            _handlers = new List<IBotTaskHandler>();
-
-            var handlerType = typeof (IBotTaskHandler);
-            var handlerTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => !p.IsInterface && handlerType.IsAssignableFrom(p)).ToList();
-
-
-            foreach (var h in handlerTypes)
-            {
-                var handler = Activator.CreateInstance(h);
-                _handlers.Add((IBotTaskHandler) handler);
-            }
-        }
-
-        private static void LoadTasksArgs()
+        private void LoadTasksArgs()
         {
             lock (TaskArgsLock)
             {
@@ -125,7 +110,7 @@ namespace TelegramBot.Task
             }
         }
 
-        public static void SaveArgs()
+        public void SaveArgs()
         {
             lock (TaskArgsLock)
             {
@@ -138,7 +123,7 @@ namespace TelegramBot.Task
             SaveArgs();
         }
 
-        public static void AddTaskArg(IBotTaskArg arg)
+        public void AddTaskArg(IBotTaskArg arg)
         {
             lock (TaskArgsLock)
             {
@@ -148,7 +133,7 @@ namespace TelegramBot.Task
             }
         }
 
-        public static void RemoveTaskArg(string chatId, string command)
+        public void RemoveTaskArg(string chatId, string command)
         {
             lock (TaskArgsLock)
             {
@@ -160,5 +145,29 @@ namespace TelegramBot.Task
             }
         }
 
+        public void UpdateTaskArg(IBotTaskArg arg)
+        {
+            lock (TaskArgsLock)
+            {
+                var taskArg = TaskArgs.FirstOrDefault(i => i.Id == arg.Id);
+
+                if (taskArg == null)
+                    throw new ArgumentException("Не найден аргумент с id: " + arg.Id, "arg");
+
+                taskArg.Period = arg.Period;
+                taskArg.Properties = new Dictionary<string, string>(arg.Properties);
+                SaveArgs();
+            }
+        }
+
+        public IBotTaskArg[] GetTaskArgs {
+            get
+            {
+                lock (TaskArgsLock)
+                {
+                    return TaskArgs.ToArray();
+                }
+            } 
+        }
     }
 }

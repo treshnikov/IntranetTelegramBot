@@ -14,7 +14,7 @@ namespace TelegramBot
             Name = "телефон";
         }
 
-        public CommandExecuteResult Execute(string arg, Api bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
         {
             var words = arg.Split(' ');
 

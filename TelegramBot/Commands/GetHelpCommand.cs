@@ -13,7 +13,7 @@ namespace TelegramBot
         }
 
         public string Name { get; }
-        public CommandExecuteResult Execute(string arg, Api bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
         {
             var res = "";
 

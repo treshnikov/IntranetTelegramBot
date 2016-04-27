@@ -13,7 +13,7 @@ namespace TelegramBot
             Name = "где";
         }
 
-        public CommandExecuteResult Execute(string arg, Api bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
         {
             var words = arg.Split(' ');
 
@@ -35,8 +35,19 @@ namespace TelegramBot
                 foreach (var user in users)
                 {
                     var info = Intranet.GetUserInOfficeInfo(user.email);
+
+                    user.email = string.IsNullOrWhiteSpace(user.email) ? "<email>" : user.email;
+                    user.fullname = string.IsNullOrWhiteSpace(user.fullname) ? "<fullName>" : user.fullname;
+                    user.login = string.IsNullOrWhiteSpace(user.login) ? "<login>" : user.login;
+                    user.mobilephone = string.IsNullOrWhiteSpace(user.mobilephone) ? "<mobilePhone>" : user.mobilephone;
+                    user.workphone = string.IsNullOrWhiteSpace(user.workphone) ? "<workPhone>" : user.workphone;
+
+                    info.inOfficeRus = string.IsNullOrWhiteSpace(info.inOfficeRus) ? "<inOfficeRus>" : info.inOfficeRus;
+                    info.office = string.IsNullOrWhiteSpace(info.office) ? "<office>" : info.office;
+                    info.timeAgoText = string.IsNullOrWhiteSpace(info.timeAgoText) ? "<timeAgoText>" : info.timeAgoText;
+
                     res += 
-                        user.fullname + " " + info.inOfficeRus.ToLower() + " " + info.office + " " +
+                        user.fullname == null ? user.email : user.fullname + " " + info.inOfficeRus.ToLower() + " " + info.office + " " +
                         (info.inOfficeRus == "В офисе" ? "вошел " + info.timeAgoText : info.timeAgoText) + "\r\n ";
 
                 }
