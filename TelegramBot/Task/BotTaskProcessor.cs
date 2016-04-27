@@ -53,7 +53,7 @@ namespace TelegramBot.Task
                             IEnumerable<IBotTaskArg> argsForPeriod;
                             lock (TaskArgsLock)
                             {
-                                argsForPeriod = TaskArgs.Where(i => i.Period == taskArg.Period);
+                                argsForPeriod = TaskArgs.Where(i => i.Period == taskArg.Period).ToArray();
                             }
                             if (!argsForPeriod.Any())
                                 break;
