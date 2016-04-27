@@ -22,6 +22,7 @@ namespace TelegramBot
             System.IO.Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
             _kernel = new NinjectContainer();
+            _logger = _kernel.Get<ILogger>();
 
             var botCommands = _kernel.GetAll<IBotCommand>().ToArray();
             var taskHandlers = _kernel.GetAll<IBotTaskHandler>().ToArray();
