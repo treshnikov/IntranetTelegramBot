@@ -7,6 +7,6 @@ namespace TelegramBot
     {
         void SetCommands(IEnumerable<IBotCommand> commands);
         bool TryGetCommandByName(string name, out IBotCommand cmd);
-        bool TryExecuteCommand(string arg, Api bot, string chatId, out CommandExecuteResult result);
+        bool TryExecuteCommand(string arg, IBot bot, string chatId, out CommandExecuteResult result);
     }
 }

@@ -10,7 +10,7 @@ namespace TelegramBot
         {
             Name = "/start";
         }
-        public CommandExecuteResult Execute(string words, Api bot, string chatId)
+        public CommandExecuteResult Execute(string words, IBot bot, string chatId)
         {
             return new CommandExecuteResult("");
         }

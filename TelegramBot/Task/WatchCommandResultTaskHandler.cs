@@ -18,7 +18,7 @@ namespace TelegramBot.Task
             Name = "подписаться";
         }
 
-        public void Handle(Api bot, IBotTaskArg botTaskArg)
+        public void Handle(IBot bot, IBotTaskArg botTaskArg)
         {
             var command = botTaskArg.Properties["command"];
 

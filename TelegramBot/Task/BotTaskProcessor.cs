@@ -13,14 +13,14 @@ namespace TelegramBot.Task
 {
     public class BotTaskProcessor : IDisposable, IBotTaskProcessor
     {
-        private static Api _bot;
+        private static IBot _bot;
         private readonly ILogger _logger;
         private List<IBotTaskHandler>  _handlers;
         public List<IBotTaskArg> TaskArgs { get; set; }
         private Dictionary<TimeSpan, Thread> Threads { get; set; } 
         private static readonly object TaskArgsLock = new object();
 
-        public BotTaskProcessor(Api bot, ILogger logger)
+        public BotTaskProcessor(IBot bot, ILogger logger)
         {
             TaskArgs = new List<IBotTaskArg>();
             Threads = new Dictionary<TimeSpan, Thread>();
@@ -53,7 +53,7 @@ namespace TelegramBot.Task
                             IEnumerable<IBotTaskArg> argsForPeriod;
                             lock (TaskArgsLock)
                             {
-                                argsForPeriod = TaskArgs.Where(i => i.Period == taskArg.Period).ToArray();
+                                argsForPeriod = TaskArgs.Where(i => i.Period == taskArg.Period);
                             }
                             if (!argsForPeriod.Any())
                                 break;
@@ -156,6 +156,7 @@ namespace TelegramBot.Task
 
                 taskArg.Period = arg.Period;
                 taskArg.Properties = new Dictionary<string, string>(arg.Properties);
+                SaveArgs();
             }
         }
 

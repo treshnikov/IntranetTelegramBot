@@ -31,7 +31,7 @@ namespace TelegramBot
             return false;
         }
 
-        public bool TryExecuteCommand(string arg, Api bot, string chatId, out CommandExecuteResult result)
+        public bool TryExecuteCommand(string arg, IBot bot, string chatId, out CommandExecuteResult result)
         {
             var words = arg.Split(' ');
 

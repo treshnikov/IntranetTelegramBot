@@ -1,34 +1,27 @@
 using System;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using Infrastructure;
 using Logger;
 using Ninject;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramBot.Task;
-using File = System.IO.File;
 
 namespace TelegramBot
 {
     public class TelegramBot
     {
-        private volatile bool _isRunning = false;
-        private Api _bot;
-        private ILogger _logger;
-        private ICommandProcessor _commandProcessor;
-        private IBotTaskProcessor _taskProcessor;
+        private volatile bool _isRunning;
+        private IntranetTelegramBot _bot;
+        private readonly ILogger _logger;
+        private readonly ICommandProcessor _commandProcessor;
+        private readonly IBotTaskProcessor _taskProcessor;
         private readonly IKernel _kernel;
 
         public TelegramBot()
         {
             System.IO.Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-            _kernel = new StandardKernel();
-            SetBindings();
-
-            _logger = _kernel.Get<ILogger>();
+            _kernel = new NinjectContainer();
 
             var botCommands = _kernel.GetAll<IBotCommand>().ToArray();
             var taskHandlers = _kernel.GetAll<IBotTaskHandler>().ToArray();
@@ -38,7 +31,6 @@ namespace TelegramBot
 
             _commandProcessor = _kernel.Get<ICommandProcessor>();
             _commandProcessor.SetCommands(botCommands);
-
         }
 
         public void Start()
@@ -47,44 +39,14 @@ namespace TelegramBot
                 return;
 
             _isRunning = true;
-            _bot = new Api(SettingsProvider.Get().BotApiKey)
-            {
-                IsReceiving = true
-            };
+
+            _bot = (IntranetTelegramBot) _kernel.Get<IBot>();
+
+            _bot.IsReceiving = true;
             _bot.StartReceiving();
             _bot.MessageReceived += BotOnMessageReceived();
-
         }
 
-        private void SetBindings()
-        {
-            _kernel.Bind<ILogger>().To<NLogger>();
-
-            var commandTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => !p.IsInterface && typeof (IBotCommand).IsAssignableFrom(p)).ToList();
-
-            var taskHandlerTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => !p.IsInterface && typeof (IBotTaskHandler).IsAssignableFrom(p)).ToList();
-
-            foreach (var commandType in commandTypes)
-            {
-                _kernel.Bind<IBotCommand>().To(commandType).Named(commandType.Name);
-            }
-
-            foreach (var h in taskHandlerTypes)
-            {
-                _kernel.Bind<IBotTaskHandler>().To(h).Named(h.Name);
-            }
-
-            _kernel.Bind<ICommandProcessor>().To<CommandProcessor>()
-                .InSingletonScope();
-
-            _kernel.Bind<IBotTaskProcessor>().To<BotTaskProcessor>()
-                .InSingletonScope()
-                .WithConstructorArgument("bot", _bot);
-        }
 
         private EventHandler<MessageEventArgs> BotOnMessageReceived()
         {
@@ -113,6 +75,7 @@ namespace TelegramBot
                 catch (Exception ex)
                 {
                     _bot.SendTextMessage(arg.Message.Chat.Id, "Не удалось выполнить команду \"" + args + "\"");
+                    _logger.Error("Ошибка обработки команды + " + args + " " + ex);
                 }
 
             };
