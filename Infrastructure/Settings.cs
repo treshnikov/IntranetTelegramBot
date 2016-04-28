@@ -11,6 +11,9 @@ namespace Infrastructure
 
         public string BotApiKey { get; set; }
 
+        public string[] AllowedUsers { get; set; }
+        public string Password { get; set; }
+
     }
 
     public static class SettingsProvider

@@ -64,12 +64,19 @@ namespace TelegramBot
                     
                     _logger.Debug(log);
 
-                    CommandExecuteResult res;
-                    _commandProcessor.TryExecuteCommand(args, _bot, arg.Message.Chat.Id.ToString(), out res);
-
-                    if (res.Type == CommandResultType.Text)
+                    if (CheckAuth(arg))
                     {
-                        _bot.SendTextMessage(arg.Message.Chat.Id, res.ResultAsText);
+                        CommandExecuteResult res;
+                        _commandProcessor.TryExecuteCommand(args, _bot, arg.Message.Chat.Id.ToString(), arg.Message.From.Username, out res);
+
+                        if (res.Type == CommandResultType.Text)
+                        {
+                            _bot.SendTextMessage(arg.Message.Chat.Id, res.ResultAsText);
+                        }
+                    }
+                    else
+                    {
+                        _bot.SendTextMessage(arg.Message.Chat.Id, "¬ы не авторизованы. ƒл€ авторизации выполните команду 'авторизоватьс€ пароль'. ѕароль можно запросить у контакта @treshnikov.");
                     }
 
                 }
@@ -80,6 +87,15 @@ namespace TelegramBot
                 }
 
             };
+        }
+
+        private bool CheckAuth(MessageEventArgs arg)
+        {
+            if (arg.Message.Text.ToLower().StartsWith("авторизоватьс€"))
+                return true;
+
+            var allowedUsers = SettingsProvider.Get().AllowedUsers;
+            return allowedUsers != null && allowedUsers.Contains(arg.Message.From.Username);
         }
 
         public void Stop()

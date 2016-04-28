@@ -1,6 +1,7 @@
 using System.Linq;
 using Infrastructure;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace TelegramBot
 {
@@ -13,7 +14,7 @@ namespace TelegramBot
             Name = "где";
         }
 
-        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId, string user1)
         {
             var words = arg.Split(' ');
 

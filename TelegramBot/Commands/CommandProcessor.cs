@@ -31,7 +31,7 @@ namespace TelegramBot
             return false;
         }
 
-        public bool TryExecuteCommand(string arg, IBot bot, string chatId, out CommandExecuteResult result)
+        public bool TryExecuteCommand(string arg, IBot bot, string chatId, string user, out CommandExecuteResult result)
         {
             var words = arg.Split(' ');
 
@@ -46,7 +46,7 @@ namespace TelegramBot
 
             if (cmdFound)
             {
-                result = cmd.Execute(arg, bot, chatId);
+                result = cmd.Execute(arg, bot, chatId, user);
                 return true;
             }
             else
@@ -57,5 +57,7 @@ namespace TelegramBot
             }
 
         }
+
+        public IBotCommand[] Commands => _commands.ToArray();
     }
 }

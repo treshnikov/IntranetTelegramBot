@@ -1,4 +1,5 @@
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace TelegramBot
 {
@@ -10,7 +11,7 @@ namespace TelegramBot
         {
             Name = "/start";
         }
-        public CommandExecuteResult Execute(string words, IBot bot, string chatId)
+        public CommandExecuteResult Execute(string words, IBot bot, string chatId, string user)
         {
             return new CommandExecuteResult("");
         }

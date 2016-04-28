@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using TelegramBot.Task;
 
 namespace TelegramBot
@@ -16,7 +17,7 @@ namespace TelegramBot
             Name = "отписаться";
         }
 
-        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId, string user)
         {
             var words = arg.Split(' ');
 
@@ -35,7 +36,7 @@ namespace TelegramBot
 
             _taskProcessor.RemoveTaskArg(chatId, subscribtion[subscribtionNumber - 1].Properties["command"]);
 
-            var res = new GetSubscribtionListBotCommand(_taskProcessor).Execute("подписки", bot, chatId).ResultAsText;
+            var res = new GetSubscribtionListBotCommand(_taskProcessor).Execute("подписки", bot, chatId, user).ResultAsText;
             return new CommandExecuteResult("Подписка успешна удалена:\r\n"+res);
         }
 

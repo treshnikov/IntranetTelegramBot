@@ -12,6 +12,7 @@ namespace TelegramBot.Task
         string ChatId { get; }
         TimeSpan Period { get; set; }
         IDictionary<string, string> Properties { get; set; }
+        string User { get; }
     }
 
     [Serializable]
@@ -22,5 +23,6 @@ namespace TelegramBot.Task
         public string ChatId { get; set; }
         public TimeSpan Period { get; set; }
         public IDictionary<string, string> Properties { get; set; }
+        public string User { get; set; }
     }
 }

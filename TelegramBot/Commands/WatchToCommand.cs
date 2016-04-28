@@ -19,7 +19,7 @@ namespace TelegramBot
             Name = "подписаться";
         }
 
-        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId, string user)
         {
             var words = arg.Split(' ');
 
@@ -44,13 +44,14 @@ namespace TelegramBot
                 Period = TimeSpan.FromSeconds(30),
                 Properties = new Dictionary<string, string>(),
                 TaskHandlerName = "подписаться",
+                User = user
             };
 
             taskArg.Properties["command"] = command;
 
             _taskProcessor.AddTaskArg(taskArg);
 
-            var res = new GetSubscribtionListBotCommand(_taskProcessor).Execute("подписки", bot, chatId).ResultAsText;
+            var res = new GetSubscribtionListBotCommand(_taskProcessor).Execute("подписки", bot, chatId, user).ResultAsText;
             return new CommandExecuteResult("Подписка успешна добавлена:\r\n" + res);
         }
 

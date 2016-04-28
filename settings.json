@@ -1,6 +1,7 @@
 {
-  "BotApiKey": "",
+  "BotApiKey" :  "",
   "IntranetDomain": "cmc",
   "IntranetPassword": "",
-  "IntranetUserName": "pat"
+  "IntranetUserName": "pat",
+  "Password": ""
 }

@@ -1,32 +1,26 @@
-using System;
-using System.Linq;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-
 namespace TelegramBot
 {
     public class GetHelpCommand : IBotCommand
     {
-        public GetHelpCommand()
+        private readonly ICommandProcessor _commandProcessor;
+
+        public GetHelpCommand(ICommandProcessor commandProcessor)
         {
+            _commandProcessor = commandProcessor;
             Name = "/help";
         }
 
         public string Name { get; }
-        public CommandExecuteResult Execute(string arg, IBot bot, string chatId)
+        public CommandExecuteResult Execute(string arg, IBot bot, string chatId, string user)
         {
             var res = "";
 
-            var commandType = typeof(IBotCommand);
-            var commandTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => !p.IsInterface && commandType.IsAssignableFrom(p)).ToList();
 
-            foreach (var ct in commandTypes)
+            foreach (var cmd in _commandProcessor.Commands)
             {
-                var cmd = (IBotCommand)Activator.CreateInstance(ct);
                 if (cmd.GetHelp() != "")
                     res += "\u27A1 " + cmd.GetHelp() + "\r\n";
+
             }
 
             return new CommandExecuteResult(res);

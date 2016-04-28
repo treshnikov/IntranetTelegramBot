@@ -23,7 +23,7 @@ namespace TelegramBot.Task
             var command = botTaskArg.Properties["command"];
 
             CommandExecuteResult res;
-            if (_commandProcessor.TryExecuteCommand(command, bot, botTaskArg.ChatId.ToString(), out res))
+            if (_commandProcessor.TryExecuteCommand(command, bot, botTaskArg.ChatId.ToString(), botTaskArg.User, out res))
             {
                 var currentValue = botTaskArg.Properties.ContainsKey("currentValue")
                     ? botTaskArg.Properties["currentValue"]

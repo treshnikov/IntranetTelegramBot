@@ -6,7 +6,7 @@ namespace TelegramBot
     public interface IBotCommand
     {
         string Name { get; }
-        CommandExecuteResult Execute(string arg, IBot bot, string chatId);
+        CommandExecuteResult Execute(string arg, IBot bot, string chatId, string user);
         string GetHelp();
     }
 
