@@ -75,7 +75,9 @@
   <ItemGroup>
     <Compile Include="Commands\AuthBotCommand.cs" />
     <Compile Include="Commands\CommandProcessor.cs" />
+    <Compile Include="Commands\GetAllowedUsersBotCommand.cs" />
     <Compile Include="Commands\GetHelpCommand.cs" />
+    <Compile Include="Commands\GetPasswordBotCommand.cs" />
     <Compile Include="Commands\GetSubscribtionListBotCommand.cs" />
     <Compile Include="Commands\GetUserLocationCommand.cs" />
     <Compile Include="Commands\GetUserMailCommand.cs" />

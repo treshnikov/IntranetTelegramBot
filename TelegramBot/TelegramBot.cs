@@ -77,6 +77,7 @@ namespace TelegramBot
                     else
                     {
                         _bot.SendTextMessage(arg.Message.Chat.Id, "¬ы не авторизованы. ƒл€ авторизации выполните команду 'авторизоватьс€ пароль'. ѕароль можно запросить у контакта @treshnikov.");
+                        _logger.Warn("ѕользователь " + contact + "("+ arg.Message.From.Username +") не авторизован, команда '"+arg.Message.Text+"' не будет выполнена.");
                     }
 
                 }
