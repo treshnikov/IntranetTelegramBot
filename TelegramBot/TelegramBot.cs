@@ -95,8 +95,8 @@ namespace TelegramBot
             if (arg.Message.Text.ToLower().StartsWith("авторизоваться"))
                 return true;
 
-            var allowedUsers = SettingsProvider.Get().AllowedUsers;
-            return allowedUsers != null && allowedUsers.Contains(arg.Message.From.Username);
+            var authChatIds = SettingsProvider.Get().AuthChatIds;
+            return authChatIds != null && authChatIds.Contains(arg.Message.Chat.Id.ToString());
         }
 
         public void Stop()

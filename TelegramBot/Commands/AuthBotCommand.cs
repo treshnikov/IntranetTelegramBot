@@ -27,11 +27,11 @@ namespace TelegramBot
             var password = settings.Password;
             if (userPassword == password)
             {
-                if (settings.AllowedUsers == null)
-                    settings.AllowedUsers = new string[0] {};
+                if (settings.AuthChatIds == null)
+                    settings.AuthChatIds = new string[0] {};
 
-                var newUsersList = new List<string>(settings.AllowedUsers) {user};
-                settings.AllowedUsers = newUsersList.ToArray();
+                var newUsersList = new List<string>(settings.AuthChatIds) {chatId};
+                settings.AuthChatIds = newUsersList.ToArray();
 
                 SettingsProvider.Set(settings);
 

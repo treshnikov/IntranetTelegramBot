@@ -8,11 +8,11 @@ namespace TelegramBot
         public string Name => "пользователи";
         public CommandExecuteResult Execute(string arg, IBot bot, string chatId, string user)
         {
-            var users = SettingsProvider.Get().AllowedUsers;
+            var users = SettingsProvider.Get().AuthChatIds;
             if (users == null)
                 return new CommandExecuteResult("Пользователей не зарегистрировано");
 
-            return new CommandExecuteResult(users.Aggregate((a, b) => b + a + ", "));
+            return new CommandExecuteResult(users.Aggregate((a, b) => a + ", " + b));
         }
 
         public string GetHelp()
