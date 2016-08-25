@@ -40,7 +40,8 @@ namespace TelegramBot.Task
 
                     if (!string.IsNullOrWhiteSpace(currentValue))
                     {
-                        bot.SendTextMessage(botTaskArg.ChatId, "Оповещение для '" + command + "': " + res.ResultAsText);
+                        //bot.SendTextMessage(botTaskArg.ChatId, "Оповещение для '" + command + "': " + res.ResultAsText);
+                        bot.SendTextMessage(botTaskArg.ChatId, res.ResultAsText + " [оповещение для '" + command + "']");
                     }
                 }
             }
