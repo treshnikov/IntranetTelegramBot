@@ -36,7 +36,7 @@ namespace TelegramBot
                 var res = "";
                 foreach (var user in users)
                 {
-                    res += user.fullname + " " + user.email + "\r\n ";
+                    res += user.fullname + " " + (string.IsNullOrWhiteSpace(user.email) ? "<в интранете почта не указана>" : user.email ) + "\r\n ";
                 }
 
                 return new CommandExecuteResult(res);

@@ -35,6 +35,10 @@ namespace TelegramBot
                 var res = "";
                 foreach (var user in users)
                 {
+                    // пользоваетелей в офисе можно получить только по почте, нет почты, нет информации
+                    if (string.IsNullOrWhiteSpace(user.email))
+                        continue;
+
                     var info = Intranet.GetUserInOfficeInfo(user.email);
 
                     user.email = string.IsNullOrWhiteSpace(user.email) ? "<email>" : user.email;
@@ -52,6 +56,9 @@ namespace TelegramBot
                         (info.inOfficeRus == "В офисе" ? "вошел " + info.timeAgoText : info.timeAgoText) + "\r\n ";
 
                 }
+
+                if (res == "")
+                    return new CommandExecuteResult("Данных для \"" + userName + "\"  не обнаружено");
 
                 return new CommandExecuteResult(res);
             }

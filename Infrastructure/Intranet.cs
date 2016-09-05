@@ -34,7 +34,7 @@ namespace Infrastructure
                 var usersJson = DecodeEncodedNonAsciiCharacters(Encoding.UTF8.GetString(data));
                 var users = JsonConvert.DeserializeObject<UserInfoDto[]>(usersJson);
 
-                return users.Where(u => !string.IsNullOrWhiteSpace(u.email)).ToArray();
+                return users.ToArray();
             }
         }
 
