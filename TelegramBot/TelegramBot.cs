@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using System.Net;
 using Infrastructure;
 using Logger;
 using Ninject;
+using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using TelegramBot.Task;
@@ -46,9 +48,8 @@ namespace TelegramBot
 
             _bot.IsReceiving = true;
             _bot.StartReceiving();
-            _bot.MessageReceived += BotOnMessageReceived();
+            _bot.OnMessage += BotOnMessageReceived();
         }
-
 
         private EventHandler<MessageEventArgs> BotOnMessageReceived()
         {
@@ -72,19 +73,19 @@ namespace TelegramBot
 
                         if (res.Type == CommandResultType.Text)
                         {
-                            _bot.SendTextMessage(arg.Message.Chat.Id, res.ResultAsText);
+                            _bot.SendTextMessage(arg.Message.Chat.Id.ToString(), res.ResultAsText);
                         }
                     }
                     else
                     {
-                        _bot.SendTextMessage(arg.Message.Chat.Id, "Вы не авторизованы. Для авторизации выполните команду 'авторизоваться пароль'. Пароль можно запросить у контакта @treshnikov.");
+                        _bot.SendTextMessage(arg.Message.Chat.Id.ToString(), "Вы не авторизованы. Для авторизации выполните команду 'авторизоваться пароль'. Пароль можно запросить у контакта @treshnikov.");
                         _logger.Warn("Пользователь " + contact + "("+ arg.Message.From.Username +") не авторизован, команда '"+arg.Message.Text+"' не будет выполнена.");
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    _bot.SendTextMessage(arg.Message.Chat.Id, "Не удалось выполнить команду \"" + args + "\"");
+                    _bot.SendTextMessage(arg.Message.Chat.Id.ToString(), "Не удалось выполнить команду \"" + args + "\"");
                     _logger.Error("Ошибка обработки команды + " + args + " " + ex);
                 }
 
@@ -106,7 +107,7 @@ namespace TelegramBot
                 return;
 
             _bot.StopReceiving();
-            _bot.MessageReceived -= BotOnMessageReceived();
+            _bot.OnMessage -= BotOnMessageReceived();
             _isRunning = false;
 
             _taskProcessor.Dispose();

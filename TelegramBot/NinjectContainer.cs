@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net;
 using Infrastructure;
 using Logger;
 using Ninject;
@@ -19,10 +20,15 @@ namespace TelegramBot
         {
             Bind<ILogger>().To<NLogger>().InSingletonScope();
 
-            Bind<IBot>()
+
+            var botSettings = Bind<IBot>()
                 .To<IntranetTelegramBot>()
                 .InSingletonScope()
                 .WithConstructorArgument("token", SettingsProvider.Get().BotApiKey);
+            if (!string.IsNullOrWhiteSpace(SettingsProvider.Get().Proxy))
+            {
+                botSettings.WithConstructorArgument("webProxy", new WebProxy(SettingsProvider.Get().Proxy));
+            }
 
             var commandTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())

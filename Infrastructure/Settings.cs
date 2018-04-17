@@ -10,6 +10,7 @@ namespace Infrastructure
         public string IntranetDomain { get; set; }
 
         public string BotApiKey { get; set; }
+        public string Proxy { get; set; }
 
         public string[] AuthChatIds { get; set; }
         public string Password { get; set; }
