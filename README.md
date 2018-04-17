@@ -17,7 +17,9 @@
   "BotApiKey": "FEC1AE38-F3EB-44A9-BBCC-B411D32A9E9A",
   "IntranetDomain": "cmc",
   "IntranetPassword": "****",
-  "IntranetUserName": "user"
+  "IntranetUserName": "user",
+  "Password": "password for authorization for new users",
+  "Proxy":"127.0.0.1:8888"
 }
 ```
 
