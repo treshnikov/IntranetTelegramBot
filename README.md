@@ -14,12 +14,12 @@
 Настройки хранятся в файле settings.json
 ```
 {
-  "BotApiKey": "...",		 // telegram bot api key
-  "Secret": "...",			 // secret key, is required to authorize a new user
-  "IntranetUserName": "...", // intranet user name
-  "IntranetPassword": "...", // intranet user password
-  "IntranetDomain": "...",   // domain name
-  "Proxy": "127.0.0.1:8080"	 // proxy server address, optional 
+  "BotApiKey": "...",         // telegram bot api key
+  "Secret": "...",			      // secret key, is required to authorize a new user
+  "IntranetUserName": "...",  // intranet user name
+  "IntranetPassword": "...",  // intranet user password
+  "IntranetDomain": "...",    // domain name
+  "Proxy": "127.0.0.1:8080"   // proxy server address, optional 
 }
 
 ```
