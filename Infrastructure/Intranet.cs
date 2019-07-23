@@ -59,39 +59,6 @@ namespace Infrastructure
             }
         }
 
-        public static UserInOfficeDto GetUserInOfficeInfoFromGrabber(string mailArg)
-        {
-            var number = _random.Next(1000);
-            var inFile = @"\\vm-projects\share\in" + number + ".txt";
-            var outFile = @"\\vm-projects\share\out" + number + ".txt";
-
-            using (Impersonation.LogonUser(
-                           "VM-Projects",
-                           "adminga",
-                           "GApioner25",
-                           LogonType.NewCredentials))
-            {
-                var start = DateTime.Now;
-                while (true)
-                {
-                    if (!File.Exists(inFile))
-                        File.WriteAllText(inFile, mailArg);
-
-                    if (File.Exists(outFile))
-                    {
-                        var data = File.ReadAllText(outFile);
-                        var res = JsonConvert.DeserializeObject<UserInOfficeDto>(data);
-                        File.Delete(inFile);
-                        File.Delete(outFile);
-                        return res;
-                    }
-
-                    if ((DateTime.Now - start).TotalSeconds > 30)
-                        throw new ArgumentException("timeout");
-                }
-            }
-        }
-
         static string DecodeEncodedNonAsciiCharacters(string value)
         {
             return Regex.Replace(
