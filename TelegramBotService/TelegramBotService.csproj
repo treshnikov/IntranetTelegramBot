@@ -63,6 +63,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
+      <Project>{fcd10d8e-5a0e-4110-9add-92ea06e03336}</Project>
+      <Name>Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logger\Logger.csproj">
+      <Project>{2df68fbb-8019-40d2-ada6-000adbfbb281}</Project>
+      <Name>Logger</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TelegramBot\TelegramBot.csproj">
       <Project>{40171AC9-D9FE-4923-BF05-9EC55F4B7EC8}</Project>
       <Name>TelegramBot</Name>

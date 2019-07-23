@@ -20,14 +20,14 @@ namespace TelegramBot
         {
             Bind<ILogger>().To<NLogger>().InSingletonScope();
 
-
             var botSettings = Bind<IBot>()
                 .To<IntranetTelegramBot>()
                 .InSingletonScope()
                 .WithConstructorArgument("token", SettingsProvider.Get().BotApiKey);
             if (!string.IsNullOrWhiteSpace(SettingsProvider.Get().Proxy))
             {
-                botSettings.WithConstructorArgument("webProxy", new WebProxy(SettingsProvider.Get().Proxy));
+                var proxy = SettingsProvider.Get().Proxy;
+                botSettings.WithConstructorArgument("webProxy", new WebProxy(proxy));
             }
 
             var commandTypes = AppDomain.CurrentDomain.GetAssemblies()
