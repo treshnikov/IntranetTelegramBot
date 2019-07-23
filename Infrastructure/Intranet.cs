@@ -14,8 +14,6 @@ namespace Infrastructure
 {
     public static class Intranet
     {
-        static Random _random = new Random(100000);
-
         public static UserInfoDto[] GetUsers()
         {
             var settings = SettingsProvider.Get();
@@ -59,7 +57,7 @@ namespace Infrastructure
             }
         }
 
-        static string DecodeEncodedNonAsciiCharacters(string value)
+        private static string DecodeEncodedNonAsciiCharacters(string value)
         {
             return Regex.Replace(
                 value,
@@ -67,13 +65,6 @@ namespace Infrastructure
                 m => {
                     return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString();
                 });
-        }
-
-        static string FirstCharToUpper(string input)
-        {
-            if (String.IsNullOrEmpty(input))
-                throw new ArgumentException("ARGH!");
-            return input.First().ToString().ToUpper() + input.Substring(1);
         }
     }
 }
