@@ -11,16 +11,17 @@
 * Команда 'подписаться' оформляет подписку на изменение указанной команды, например 'подписаться где иванов'
 
 #### Настройка
-Отредактировать файл settings.json
+Настройки хранятся в файле settings.json
 ```
 {
-  "BotApiKey": "FEC1AE38-F3EB-44A9-BBCC-B411D32A9E9A",
-  "IntranetDomain": "cmc",
-  "IntranetPassword": "****",
-  "IntranetUserName": "user",
-  "Password": "password for authorization for new users",
-  "Proxy":"127.0.0.1:8888"
+  "BotApiKey": "...",		 // telegram bot api key
+  "Secret": "...",			 // secret key, is required to authorize a new user
+  "IntranetUserName": "...", // intranet user name
+  "IntranetPassword": "...", // intranet user password
+  "IntranetDomain": "...",   // domain name
+  "Proxy": "127.0.0.1:8080"	 // proxy server address, optional 
 }
+
 ```
 
 #### Архитектура

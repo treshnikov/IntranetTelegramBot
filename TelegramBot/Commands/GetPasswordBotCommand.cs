@@ -10,7 +10,7 @@ namespace TelegramBot
             if (user != "treshnikov")
                 return new CommandExecuteResult("Недостаточно прав.");
 
-            return new CommandExecuteResult(SettingsProvider.Get().Password);
+            return new CommandExecuteResult(SettingsProvider.Get().Secret);
         }
 
         public string GetHelp()

@@ -22,10 +22,10 @@ namespace TelegramBot
             if (words.Length < 2)
                 bot.SendTextMessage(chatId, "Для авторизации надо указать пароль.");
 
-            var userPassword = words[1];
+            var userSecret = words[1];
             var settings = SettingsProvider.Get();
-            var password = settings.Password;
-            if (userPassword == password)
+            var secret = settings.Secret;
+            if (userSecret == secret)
             {
                 if (settings.AuthChatIds == null)
                     settings.AuthChatIds = new string[0] {};

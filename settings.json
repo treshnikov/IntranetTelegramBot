@@ -1,7 +1,8 @@
 {
-  "BotApiKey" :  "",
-  "IntranetDomain": "cmc",
-  "IntranetPassword": "",
-  "IntranetUserName": "pat",
-  "Password": ""
+  "IntranetUserName": "...", // intranet user name
+  "IntranetPassword": "...", // intranet user password
+  "IntranetDomain": "...",   // domain name
+  "BotApiKey": "...",		 // telegram bot api key
+  "Secret": "...",			 // secret key, requires for new uer to authorization
+  "Proxy": "127.0.0.1:8080"	 // proxy server address, optional 
 }

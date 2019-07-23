@@ -13,7 +13,7 @@ namespace Infrastructure
         public string Proxy { get; set; }
 
         public string[] AuthChatIds { get; set; }
-        public string Password { get; set; }
+        public string Secret { get; set; }
 
     }
 
