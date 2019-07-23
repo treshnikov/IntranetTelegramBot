@@ -15,7 +15,7 @@
 ```
 {
   "BotApiKey": "...",         // telegram bot api key
-  "Secret": "...",			      // secret key, is required to authorize a new user
+  "Secret": "...",            // secret key, is required to authorize a new user
   "IntranetUserName": "...",  // intranet user name
   "IntranetPassword": "...",  // intranet user password
   "IntranetDomain": "...",    // domain name
