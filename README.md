@@ -13,7 +13,7 @@ A telegram bot that let you communicate with the SMS-intranet site and fetch inf
 
 # Configuration
 Настройки хранятся в файле settings.json
-```json
+```
 {
   "BotApiKey": "...",         // telegram bot api key
   "Secret": "...",            // secret key, is required to authorize a new user
